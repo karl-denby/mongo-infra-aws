@@ -1,0 +1,22 @@
+locals {
+  ### Rename this file settings.tf once you have filled in the required values
+
+  # A prefix for every machine created, so you can find it easily
+  tag_instance_name_prefix = "testing"
+
+  # A tag for the owner, I use this to work out who is creating what  
+  tag_owner = "first.last"
+
+  # A tag that is used to indicate when the machine can be deleted (I have a script to do this)
+  tag_keep_until = formatdate("YYYY-MM-DD", timeadd(timestamp(), "25h"))
+
+  # The VPC in which to create your security group
+  default_vpc_id = "vpc-1a1a1a11a11aa1a1a1"
+
+  # The IP Address or CIDRs you want to give access to the created machines
+  cidr_blocks = toset(
+    [
+      "1.1.1.1/32"   # Replace this with your IP
+    ]
+  )
+}

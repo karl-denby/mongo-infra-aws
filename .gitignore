@@ -1,0 +1,13 @@
+.git
+.terraform
+ansible/inventory.ini
+ansible/*.retry
+terraform.tfstate
+terraform.tfstate.backup
+vars/om-vars.yaml
+.terraform.*
+ansible/nginx.conf
+ansible/vars/om-vars.yaml
+.DS_Store
+ansible/*.keytab
+settings.tf
