@@ -1,0 +1,92 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deploy
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Download .rpm
+  get_url:
+    url: "{{ om_url.0 }}/download/agent/automation/mongodb-mms-automation-agent-manager-latest.aarch64.amzn2.rpm"
+    #url: "{{ om_url.0 }}/download/agent/automation/mongodb-mms-automation-agent-manager-12.0.5.7560-1.aarch64.amzn2.rpm"
+    dest: /home/ec2-user/mongodb-agent.rpm
+    mode: '0640'
+
+- name: "Install MongoDB Enterprise dependencies via yum"
+  become: yes
+  become_user: root
+  yum:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+        - cyrus-sasl
+        - cyrus-sasl-gssapi
+        - cyrus-sasl-plain
+        - krb5-libs
+        - libcurl
+        - lm_sensors-libs
+        - net-snmp
+        - net-snmp-agent-libs
+        - openldap
+        - openssl
+        - tcp_wrappers-libs
+        - xz-libs
+
+- name: Stop mongodb-mms-automation-agent.service if exists
+  become: yes
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongodb-mms-automation-agent; then systemctl stop mongodb-mms-automation-agent && echo stopped; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+- name: Install an .rpm package
+  become: yes
+  become_user: root
+  yum:
+    name: /home/ec2-user/mongodb-agent.rpm
+    state: present
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsGroupId='
+    line: mmsGroupId={{project_id}}
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsApiKey='
+    line: mmsApiKey={{api_key}}
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsBaseUrl='
+    line: mmsBaseUrl={{ om_url.0 }}
+
+- name: Create data directory
+  become: yes
+  become_user: root
+  file:
+    path: /data
+    state: directory
+    recurse: yes
+    owner: mongod
+    group: mongod
+
+- name: "Enable mongodb-mms-automation-agent service"
+  become: yes
+  become_user: root
+  service:
+    name: mongodb-mms-automation-agent
+    enabled: yes
+
+- name: "Start mongodb-mms-automation-agent service"
+  become: yes
+  become_user: root
+  service: name=mongodb-mms-automation-agent state=started

@@ -1,0 +1,31 @@
+# - name: Install k0s on CentOS
+#   import_tasks: centos.yml
+#   when: ansible_facts['distribution'] == 'CentOS'
+
+# - name: Install k0s on RedHat
+#   import_tasks: rhel.yml
+#   when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['architecture'] == "x86_64"
+
+# - name: Install k0s on RedHat
+#   import_tasks: rhel_arm.yml
+#   when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['architecture'] == "aarch64"
+
+# - name: Install k0s on Amazon
+#   import_tasks: amazon.yml
+#   when: ansible_facts['distribution'] == 'Amazon' and ansible_facts['architecture'] == "x86_64"
+
+# - name: Install k0s on Amazon
+#   import_tasks: amazon_arm.yml
+#   when: ansible_facts['distribution'] == 'Amazon' and ansible_facts['architecture'] == "aarch64"
+
+- name: Install k0s on Ubuntu
+  import_tasks: ubuntu.yml
+  when: ansible_facts['distribution'] == 'Ubuntu'
+
+# - name: Install k0s on Debian
+#   import_tasks: debian.yml
+#   when: ansible_facts['distribution'] == 'Debian'
+
+# - name: Install k0s on Suse
+#   import_tasks: suse.yml
+#   when: ansible_facts['distribution'] == 'SLES'

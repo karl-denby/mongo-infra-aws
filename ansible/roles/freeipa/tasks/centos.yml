@@ -1,0 +1,109 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Authenticate with FreeIPA
+  command: kinit admin@IDM.EXAMPLE.COM
+  args:
+    stdin: "password"
+
+- name: Create Atlas LDAP user
+  ansible.builtin.shell: ipa user-add atlas_ldap_user --first=Atlas --last=LDAP --cn=atlas_ldap_user --random --email=atlas_ldap_user@idm.example.com
+  register: shell_output
+
+- debug: 
+    var: shell_output.stdout_lines
+
+- name: Create Atlas Group
+  shell: ipa group-add --desc='Atlas Users' atlasUsers
+
+- name: Add atlas_ldap_user to group atlasUsers
+  shell: ipa group-add-member atlasUsers --users=atlas_ldap_user
+
+- name: Create ops_manager_global_admin LDAP user
+  ansible.builtin.shell: ipa user-add ops_manager_global_admin --first=global --last=admin --cn=ops_manager_global_admin --random --email=ops_manager_global_admin@idm.example.com
+  register: shell_output
+
+- debug: 
+    var: shell_output.stdout_lines
+
+- name: Create MMS Global Admin Group
+  shell: ipa group-add --desc='MMS Global Admin' mmsGlobalAdmin
+
+- name: Add ops_manager_global_admin to group mmsGlobalAdmin
+  shell: ipa group-add-member mmsGlobalAdmin --users=ops_manager_global_admin
+
+- name: Create deployment_root LDAP user
+  shell: ipa user-add deployment_root --first=deployment --last=root --cn=deployment_root --random --email=deployment_root@idm.example.com
+  register: shell_output
+
+- debug: 
+    var: shell_output.stdout_lines
+
+- name: Create group for mapping to a root role
+  shell: ipa group-add --desc='mongod root' deploymentRoot
+
+- name: Add deployment_root to group deploymentRoot
+  shell: ipa group-add-member deploymentRoot --users=deployment_root
+
+- name: Create mms_automation_admin LDAP user
+  shell: ipa user-add mms_automation_admin --first=mms --last=automation --cn=mms_automation_admin --random --email=mms_automation_admin@idm.example.com
+  register: shell_output
+
+- debug: 
+    var: shell_output.stdout_lines
+
+- name: Create group for mapping to a mms_automation role
+  shell: ipa group-add --desc='MMS automation' mmsAutomation
+
+- name: Add mms_automation_admin to mmsAutomation
+  shell: ipa group-add-member mmsAutomation --users=mms_automation_admin
+
+- name: Add a kerberos host
+  shell: ipa host-add {{ item }}
+  run_once: true
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7'] | length }}"
+  when: "HOST_COUNT | int > 0"
+  loop: "{{ x86_centos7_private }}"
+
+- name: Add a service principle
+  shell: ipa service-add mongodb/{{ item }}@IDM.EXAMPLE.COM
+  run_once: true
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7'] | length }}"
+  when: "HOST_COUNT | int > 0"
+  loop: "{{ x86_centos7_private }}"
+
+- name: Generate a keytab for each host
+  become: yes
+  become_user: root
+  shell: kadmin.local ktadd mongodb/{{ item }}@IDM.EXAMPLE.COM
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7'] | length }}"
+  when: "HOST_COUNT | int > 0"
+  loop: "{{ x86_centos7_private }}"
+
+- name: Copy keytab files to Mac
+  become: yes
+  become_user: root
+  fetch:
+    src: /etc/krb5.keytab
+    dest: "{{ item }}.keytab"
+    flat: yes
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7'] | length }}"
+  when: "HOST_COUNT | int > 0"
+  loop: "{{ x86_centos7_private }}"
+
+- name: remove the keytab we just added
+  become: yes
+  become_user: root
+  shell: kadmin.local ktremove mongodb/{{ item }}@IDM.EXAMPLE.COM
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7'] | length }}"
+  when: "HOST_COUNT | int > 0"
+  loop: "{{ x86_centos7_private }}"
+
+- name: Log out of FreeIPA
+  command: kdestroy

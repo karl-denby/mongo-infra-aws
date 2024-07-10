@@ -1,0 +1,6 @@
+---
+- name: Install extras
+  hosts: [arm_centos8s_extras]
+  gather_facts: yes
+  roles:
+    - extras

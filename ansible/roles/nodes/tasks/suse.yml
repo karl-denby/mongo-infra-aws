@@ -1,0 +1,86 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deploy
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Download .rpm
+  get_url:
+    url: "{{ om_url.0 }}/download/agent/automation/mongodb-mms-automation-agent-manager-latest.x86_64.rpm"
+    dest: /home/ec2-user/mongodb-agent.rpm
+    mode: '0640'
+
+# - name: SUSE, install MongoDB Enterprise dependencies via yum
+#   become: yes
+#   become_user: root
+#   community.general.zypper:
+#     name: "{{ packages }}"
+#     state: present
+#     update_cache: yes
+#   vars:
+#     packages:
+#         - cyrus-sasl
+#         - cyrus-sasl-gssapi
+#         - cyrus-sasl-plain
+#         - krb5
+#         - libcurl4
+#         - libldap-2_4-2
+#         - libopenssl1_0_0
+#         - libsensors4
+#         - libsnmp30
+#         - libwrap0
+#         - liblzma5
+
+- name: Stop mongodb-mms-automation-agent.service if exists
+  become: yes
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongodb-mms-automation-agent; then systemctl stop mongodb-mms-automation-agent && echo stopped; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+- name: Install an .rpm package
+  become: yes
+  become_user: root
+  command: rpm -U /home/ec2-user/mongodb-agent.rpm
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsGroupId='
+    line: mmsGroupId={{project_id}}
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsApiKey='
+    line: mmsApiKey={{api_key}}
+
+- name: Replace agent settings
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/mongodb-mms/automation-agent.config
+    regexp: '^mmsBaseUrl='
+    line: mmsBaseUrl={{ om_url.0 }}
+
+- name: Create data directory
+  become: yes
+  become_user: root
+  file:
+    path: /data
+    state: directory
+    recurse: yes
+    owner: mongod
+    group: mongod
+
+- name: reload services
+  become: yes
+  become_user: root
+  command: systemctl daemon-reload
+
+- name: start service
+  become: yes
+  become_user: root
+  command: systemctl start mongodb-mms-automation-agent

@@ -1,0 +1,157 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Disable SELinux
+  become: yes
+  become_user: root
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Set hostname to internal ec2 address
+  become: yes
+  become_user: root
+  shell: hostnamectl set-hostname {{services_public.0}}
+
+- name: Centos8 install IdM
+  become: yes
+  become_user: root
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - '@idm:DL1'
+      - 'freeipa-server'
+      - 'nginx'
+  when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
+
+# - name: Enable EPEL Repository on CentOS 7
+#   become: yes
+#   become_user: root
+#   yum:
+#     name: epel-release
+#     state: latest
+#   when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '7'
+
+# - name: "update nss* so that ipa-server doesn't fail to install"
+#   become: yes
+#   become_user: root
+#   yum: 
+#     name: nss*
+#     state: latest 
+
+# - name: "CentOS, ipa-server, nginx"
+#   become: yes
+#   become_user: root
+#   yum:
+#     name: "{{ packages }}"
+#     state: present
+#     update_cache: yes
+#   vars:
+#     packages:
+#         - cockpit                ## Web managment UI
+#         - cockpit-ws             # Cockpit Web Service
+#         - cockpit-pcp            # Cockpit PCP integration
+#         - cockpit-selinux        # Cockpit SELinux package
+#         - cockpit-doc            # Cockpit deployment and developer guide
+#         - cockpit-bridge         # Cockpit bridge server-side component
+#         - cockpit-dashboard      # Cockpit remote servers and dashboard
+#         - cockpit-docker         # Cockpit user interface for Docker containers
+#         - cockpit-machines       # Cockpit user interface for virtual machines
+#         - cockpit-kdump          # Cockpit user interface for kernel crash dumping
+#         - cockpit-packagekit     # Cockpit user interface for package updates
+#         - cockpit-sosreport      # Cockpit user interface for diagnostic reports
+#         - cockpit-kubernetes     # Cockpit user interface for Kubernetes cluster
+#         - cockpit-subscriptions  # Cockpit subscription user interface package
+#         - cockpit-storaged       # Cockpit user interface for storage, using Storaged
+#         - cockpit-networkmanager # Cockpit user interface for networking, using NetworkManager
+#         - cockpit-system         # Cockpit admin interface package for configuring and troubleshooting a system
+#         - ipa-server             ## LDAP/Kerberos/ntp/x509 server
+#         - ipa-server-dns         ## DNS addon
+#         - nginx                  ## Load-balancer
+#         - vim
+
+- name: CentOS, stop nginx
+  become: yes
+  become_user: root
+  systemd:
+    name: nginx
+    state: stopped
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+  when: "HOST_COUNT | int > 0"
+
+- name: Copy nginx config file
+  become: yes
+  become_user: root
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+  when: "HOST_COUNT | int > 0"
+
+- name: CentOS, start nginx
+  become: yes
+  become_user: root
+  systemd:
+    name: nginx
+    state: started
+  vars:
+    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+  when: "HOST_COUNT | int > 0"
+
+# - name: CentOS, enable cockpit.socket
+#   become: yes
+#   become_user: root
+#   systemd:
+#     name: cockpit.socket
+#     enabled: yes
+
+  # - name: Remove IPA server
+  #   become: yes
+  #   become_user: root
+  #   shell: ipa-server-install --uninstall
+  #   when: freeipa == remove
+
+- name: Create a 2GB swap file
+  become: yes
+  become_user: root
+  shell: dd if=/dev/zero of=/swap bs=1024 count=2000000
+
+- name: Change permissions of swap file
+  become: yes
+  become_user: root
+  shell: chmod 0600 /swap
+
+- name: Format swap file
+  become: yes
+  become_user: root
+  shell: mkswap /swap
+
+- name: Enable swap file
+  become: yes
+  become_user: root
+  shell: swapon /swap
+
+- name: modify the hosts file
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^::1         localhost localhost.localdomain localhost6 localhost6.localdomain6'
+    line: "{{ ansible_default_ipv4.address }} {{ services_public.0 }}"
+
+- name: Install IPA server
+  become: yes
+  become_user: root
+  shell: ipa-server-install --realm IDM.EXAMPLE.COM --ds-password password --admin-password password --skip-mem-check --unattended
+  when: freeipa == "install"
+
+#- name: Create ops_admin LDAP user
+#  become: yes
+#  become_user: root
+#  shell: ipa user-add ops_admin --first=ops --last=admin --cn=ops_admin --random --email=ops_admin@IDM.EXAMPLE.COM
+#  when: freeipa == install

@@ -1,0 +1,52 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Stop mongodb-mms if exists
+  become: yes
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongodb-mms; then systemctl stop mongodb-mms && echo stopped; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+
+- name: Download CentOS7 Versions
+  become: yes
+  become_user: mongodb-mms
+  get_url:
+    url: "{{ item.url }}"
+    dest: /opt/mongodb/mms/mongodb-releases
+    mode: '0640'
+  loop:
+    - { url: https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-rhel70-5.0.11.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel70-x86_64-100.6.0.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel70-x86_64-100.5.4.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel70-x86_64-100.5.3.tgz }
+    - { url: https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-amazon2-6.0.1.tgz }
+    - { url: https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-amazon2-5.0.11.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-amazon-x86_64-100.6.0.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-amazon-x86_64-100.5.4.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-amazon-x86_64-100.5.3.tgz }
+    - { url: https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-rhel82-6.0.1.tgz }
+    - { url: https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-rhel82-5.0.11.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel82-arm64-100.6.0.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel82-arm64-100.5.4.tgz }
+    - { url: https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel82-arm64-100.5.3.tgz }
+  when: localmode == "true"
+
+- name: Add localmode settings to /opt/mongodb/mms/conf/conf-mms.properties
+  become: yes
+  become_user: root
+  blockinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    block: |
+      {{ item.setting }}={{ item.value }}
+    marker: "# Instance Parameter Overrides"
+  loop:
+    - { setting: automation.versions.source, value: "local" }
+  when: localmode == "true"
+
+- name: "Start mongodb-mms"
+  become: yes
+  become_user: root
+  service: name=mongodb-mms state=started

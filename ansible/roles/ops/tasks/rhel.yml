@@ -1,0 +1,249 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Download .rpm
+  vars:
+    urls:
+      om_4_0_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.0.20.50639.20201104T0857Z-1.x86_64.rpm
+      om_4_2_0: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.0.56551.20190812T1752Z-1.x86_64.rpm
+      om_4_2_1: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.1.56625.20190905T1240Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_2_3: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.3.56677.20191010T1408Z-1.x86_64.rpm
+      om_4_2_4: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.4.56729.20191105T2245Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_2_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.6.56764.20191218T2322Z-1.x86_64.rpm
+      om_4_2_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.7.56773.20200107T1250Z-1.x86_64.rpm
+      om_4_2_8: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.8.56801.20200203T1802Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_2_10: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.10.56833.20200313T2159Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_2_12: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.12.56844.20200408T2127Z-1.x86_64.rpm
+      om_4_2_13: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.13.56889.20200513T2122Z-1.x86_64.rpm
+      om_4_2_14: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.14.56911.20200603T2241Z-1.x86_64.rpm
+      om_4_2_15: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.15.56937.20200701T0316Z-1.x86_64.rpm
+      om_4_2_16: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.16.56965.20200805T1936Z-1.x86_64.rpm
+      om_4_2_17: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.17.56994.20200910T0333Z-1.x86_64.rpm
+      om_4_2_18: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.18.57001.20200921T2256Z-1.x86_64.rpm
+      om_4_2_19: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.19.57005.20200925T1733Z-1.x86_64.rpm
+      om_4_2_20: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.20.57016.20201007T1901Z-1.x86_64.rpm 
+      om_4_2_21: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.21.57034.20201104T0544Z-1.x86_64.rpm
+      om_4_2_22: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.22.57049.20201202T0028Z-1.x86_64.rpm
+      om_4_2_23: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.23.57072.20210126T1741Z-1.x86_64.rpm
+      om_4_2_24: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.24.57112.20210430T1522Z-1.x86_64.rpm
+      om_4_2_25: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.25.57122.20210602T1303Z-1.x86_64.rpm
+      om_4_2_26: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.26.57139.20210727T2031Z-1.x86_64.rpm
+      om_4_2_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.26.57139.20210727T2031Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_4_1: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.1.101.20200805T0050Z-1.x86_64.rpm
+      om_4_4_2: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.2.104.20200901T0504Z-1.x86_64.rpm
+      om_4_4_3: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.3.104.20200921T2233Z-1.x86_64.rpm
+      om_4_4_4: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.4.103.20201006T2226Z-1.x86_64.rpm
+      om_4_4_5: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.5.103.20201104T1729Z-1.x86_64.rpm
+      om_4_4_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.6.100.20201201T2030Z-1.x86_64.rpm
+      om_4_4_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.7.100.20210109T1656Z-1.x86_64.rpm
+      # removed from downloads
+      om_4_4_9: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.9.100.20210216T1317Z-1.x86_64.rpm
+      om_4_4_10: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.10.100.20210303T2102Z-1.x86_64.rpm
+      om_4_4_11: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.11.100.20210330T2227Z-1.x86_64.rpm
+      om_4_4_12: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.12.100.20210503T1412Z-1.x86_64.rpm
+      om_4_4_13: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.13.100.20210603T0055Z-1.x86_64.rpm
+      om_4_4_14: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.14.100.20210610T1501Z-1.x86_64.rpm
+      om_4_4_15: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.15.99.20210629T2013Z-1.x86_64.rpm
+      om_4_4_16: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.16.100.20210804T2025Z-1.x86_64.rpm
+      om_4_4_17: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.17.100.20210901T1617Z-1.x86_64.rpm
+      om_4_4_18: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.18.100.20211103T1205Z-1.x86_64.rpm
+      om_4_4_19: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.19.100.20211116T1357Z-1.x86_64.rpm
+      om_4_4_20: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.20.100.20220110T2138Z-1.x86_64.rpm
+      om_4_4_21: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.21.100.20220217T0528Z-1.x86_64.rpm
+      om_4_4_22: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.22.100.20220504T1105Z-1.x86_64.rpm
+      om_4_4_23: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.23.100.20220706T0858Z-1.x86_64.rpm
+      om_4_4_24: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.24.100.20220728T1823Z-1.x86_64.rpm
+      om_4_4_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.4.24.100.20220728T1823Z-1.x86_64.rpm
+      om_5_0_0: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.0.100.20210710T1827Z-1.x86_64.rpm
+      om_5_0_1: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.1.97.20210805T0614Z-1.x86_64.rpm
+      om_5_0_2: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.2.100.20210901T1556Z-1.x86_64.rpm
+      om_5_0_3: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.3.100.20211005T2044Z-1.x86_64.rpm
+      om_5_0_4: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.4.100.20211103T1316Z-1.x86_64.rpm
+      om_5_0_5: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.5.100.20211201T1756Z-1.x86_64.rpm
+      om_5_0_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.6.100.20220114T1308Z-1.x86_64.rpm
+      om_5_0_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.7.100.20220217T0528Z-1.x86_64.rpm
+      om_5_0_8: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.8.100.20220302T0204Z-1.x86_64.rpm
+      om_5_0_9: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.9.100.20220407T0303Z-1.x86_64.rpm
+      om_5_0_10: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.10.100.20220503T1652Z-1.x86_64.rpm
+      om_5_0_11: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.11.100.20220602T1040Z-1.x86_64.rpm
+      om_5_0_12: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.12.100.20220628T1838Z-1.x86_64.rpm
+      om_5_0_13: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.13.100.20220711T1809Z-1.x86_64.rpm
+      om_5_0_14: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.14.100.20220802T1010Z-1.x86_64.rpm
+      om_5_0_15: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.15.100.20220916T2105Z-1.x86_64.rpm
+      om_5_0_16: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.16.100.20221019T0009Z-1.x86_64.rpm
+      om_5_0_17: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.17.100.20221115T1043Z-1.x86_64.rpm
+      om_5_0_18: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.18.100.20230201T2234Z-1.x86_64.rpm
+      om_5_0_19: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.19.100.20230209T0942Z-1.x86_64.rpm
+      om_5_0_20: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.20.100.20230313T1551Z-1.x86_64.rpm
+      om_5_0_21: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.21.100.20230530T1455Z-1.x86_64.rpm
+      om_5_0_22: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.22.100.20230726T1548Z-1.x86_64.rpm
+      om_5_0_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-5.0.22.100.20230726T1548Z-1.x86_64.rpm
+      om_6_0_0: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.0.100.20220711T2118Z.x86_64.rpm
+      om_6_0_1: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.1.100.20220720T1206Z.x86_64.rpm
+      om_6_0_2: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.2.100.20220802T0955Z.x86_64.rpm
+      om_6_0_3: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.3.100.20220830T1616Z.x86_64.rpm
+      om_6_0_4: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.4.100.20221007T1747Z.x86_64.rpm
+      om_6_0_5: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.5.100.20221019T1059Z.x86_64.rpm
+      om_6_0_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.6.100.20221102T1837Z.x86_64.rpm
+      om_6_0_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.7.100.20221129T1435Z.x86_64.rpm
+      om_6_0_8: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.8.100.20230111T1641Z.x86_64.rpm
+      om_6_0_9: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.9.100.20230201T2148Z.x86_64.rpm
+      om_6_0_10: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.10.100.20230228T0344Z.x86_64.rpm
+      om_6_0_11: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.11.100.20230310T0146Z.x86_64.rpm
+      om_6_0_12: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.12.100.20230406T1854Z.x86_64.rpm
+      om_6_0_13: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.13.100.20230502T1610Z.x86_64.rpm
+      om_6_0_14: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.14.100.20230530T1837Z.x86_64.rpm
+      om_6_0_15: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.15.100.20230614T1851Z.x86_64.rpm
+      om_6_0_16: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.16.100.20230705T1523Z.x86_64.rpm
+      om_6_0_17: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.17.100.20230801T1350Z.x86_64.rpm
+      om_6_0_18: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.18.100.20230905T1416Z.x86_64.rpm
+      om_6_0_19: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.19.100.20231002T1346Z.x86_64.rpm
+      om_6_0_20: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.20.100.20231102T2129Z.x86_64.rpm
+      om_6_0_21: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.21.100.20231213T1203Z.x86_64.rpm
+      om_6_0_22: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.22.100.20231229T1643Z.x86_64.rpm
+      om_6_0_23: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-6.0.23.100.20240402T1837Z.x86_64.rpm
+      om_6_0_latest: 
+      om_7_0_0: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.0.500.20231218T1955Z.x86_64.rpm
+      om_7_0_1: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.1.500.20240105T0225Z.x86_64.rpm
+      om_7_0_2: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.2.500.20240130T2055Z.x86_64.rpm
+      om_7_0_3: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.3.500.20240305T1921Z.x86_64.rpm
+      om_7_0_4: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.4.500.20240405T1431Z.x86_64.rpm
+      # removed from downloads 
+      om_7_0_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.6.500.20240509T1453Z.x86_64.rpm
+      om_7_0_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.7.500.20240605T1833Z.x86_64.rpm
+      om_7_0_8: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.8.500.20240627T1703Z.x86_64.rpm
+      om_7_0_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.8.500.20240627T1703Z.x86_64.rpm
+    om_download_url: "{{ urls[version] }}"
+  get_url:
+    url: "{{ om_download_url }}"
+    dest: /home/ec2-user/mongodb-mms-{{version}}.rpm
+    mode: '0440'
+
+- name: Temp turn off SELinux, will make permissive in next step
+  become: true
+  become_user: root
+  shell: setenforce 0
+
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  become: true
+  become_user: root
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Stop mongodb-mms if exists
+  become: true
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongodb-mms; then systemctl stop mongodb-mms && echo stopped; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+- name: Install an .rpm package
+  become: true
+  become_user: root
+  yum:
+    name: /home/ec2-user/mongodb-mms-{{version}}.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: Copy gen.key to all OM servers
+  become: true
+  become_user: root
+  copy:
+    src: gen.key
+    dest: /etc/mongodb-mms/gen.key
+
+- name: Create /head directory
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /head
+    state: directory
+    mode: '0755'
+    owner: mongodb-mms
+    group: mongodb-mms
+
+- name: Replace a localhost appdb with our own
+  become: true
+  become_user: root
+  lineinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    regexp: '^mongo.mongoUri'
+    line: mongo.mongoUri=mongodb://{{appdb.0}}:27017/
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int == 1" # Standalone
+
+- name: Replace a localhost appdb with our own
+  become: true
+  become_user: root
+  lineinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    regexp: '^mongo.mongoUri'
+    line: mongo.mongoUri=mongodb://{{appdb.0}}:27017,{{appdb.1}}:27017,{{appdb.2}}:27017/
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int == 3" # Replica Set
+
+- name: Add settings to /opt/mongodb/mms/conf/conf-mms.properties
+  become: true
+  become_user: root
+  blockinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    block: |
+      {{ item.setting }}={{ item.value }}
+    marker: "# Instance Parameter Overrides"
+  loop:
+    - { setting: mms.ignoreInitialUiSetup, value: "true" }
+    - { setting: mms.centralUrl, value: "{{om_url.0}}" }
+    # - { setting: automation.versions.source, value: mongodb }
+    - { setting: mms.adminEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.fromEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.replyToEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.mail.hostname, value: localhost }
+    - { setting: mms.mail.port, value: "25" }
+    - { setting: mms.mail.ssl, value: "true" }
+    - { setting: mms.mail.transport, value: smtp }
+    - { setting: mms.minimumTLSVersion, value: TLSv1.2 }
+    - { setting: backup.forceWtSnapshot, value: "true" }
+    - { setting: backup.forceSnapshot, value: "true" }
+
+- name: Add LDAP settings to /opt/mongodb/mms/conf/conf-mms.properties
+  become: true
+  become_user: root
+  blockinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    block: |
+      {{ item.setting }}={{ item.value }}
+    marker: "# Instance Parameter Overrides"
+  loop:
+    - { setting: mms.userSvcClass, value: com.xgen.svc.mms.svc.user.UserSvcLdap }
+    - { setting: mms.ldap.url, value: "ldap://{{services_private.0}}:389" }
+    - { setting: mms.ldap.bindDn, value: 'uid\=admin,cn\=users,cn\=accounts,dc\=idm,dc\=example,dc\=com' }
+    - { setting: mms.ldap.bindPassword, value: password }
+    - { setting: mms.ldap.user.baseDn, value: 'cn\=users,cn\=accounts,dc\=idm,dc=\example,dc\=com' }
+    - { setting: mms.ldap.user.searchAttribute, value: mail }
+    - { setting: mms.ldap.user.group, value: memberOf }
+    - { setting: mms.ldap.global.role.owner, value: 'cn\=mmsglobaladmin,cn\=groups,cn\=accounts,dc\=idm,dc\=example,dc\=com'  }
+    - { setting: mms.ldap.user.email, value: mail }
+    - { setting: mms.ldap.user.firstName, value: givenName }
+    - { setting: mms.ldap.user.lastName, value: sn }
+  when: ldap == "true"
+
+- name: "Enable mongodb-mms service"
+  become: true
+  become_user: root
+  service:
+    name: mongodb-mms
+    enabled: yes
+
+- name: "Start mongodb-mms"
+  become: true
+  become_user: root
+  service: name=mongodb-mms state=started

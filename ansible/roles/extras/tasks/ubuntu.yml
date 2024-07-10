@@ -1,0 +1,24 @@
+- name: "Ubuntu, Install cockpit via apt"
+  become: yes
+  become_user: root
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+        - cockpit
+
+- name: "Ubuntu, Enable cockpit service"
+  become: yes
+  become_user: root
+  service:
+    name: cockpit
+    enabled: yes
+
+- name: "Ubuntu, Start cockpit service"
+  become: yes
+  become_user: root
+  service:
+    name: cockpit
+    state: started
