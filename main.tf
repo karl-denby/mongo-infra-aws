@@ -4,6 +4,7 @@ locals {
 
   # Ops Manager Infrastructure
   amd64_rhel_8_appdb = toset([]) # If 0 use OM, if 1 standalone, if 3 replica set
+  amd64_suse_15_appdb = toset([]) # If 0 use OM, if 1 standalone, if 3 replica set
   amd64_rhel_8_oplog = toset([])
   amd64_rhel_8_blockstore = toset([])
 

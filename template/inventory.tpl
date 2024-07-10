@@ -8,6 +8,11 @@ ${host}
 ${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
+[amd64_suse_15_appdb]
+%{ for app in amd64_suse_15_appdb ~}
+${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+%{ endfor ~}
+
 [amd64_rhel_8_oplog]
 %{ for op in amd64_rhel_8_oplog ~}
 ${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'

@@ -16,3 +16,13 @@ amd64_rhel_8_public:
 %{ for node in amd64_rhel_8_public ~}
   - ${ node }
 %{ endfor ~}
+
+amd64_suse_15_private:
+%{ for node in amd64_suse_15_private ~}
+  - ${ node }
+%{ endfor ~}
+
+amd64_suse_15_public:
+%{ for node in amd64_suse_15_public ~}
+  - ${ node }
+%{ endfor ~}

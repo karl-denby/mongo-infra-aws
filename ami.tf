@@ -87,12 +87,11 @@ data "aws_ami" "rhel_8_amd64" {
   owners = ["309956199498"] # RedHat
 }
 
-
 data "aws_ami" "suse_15_amd64" {
   most_recent = true
   filter{
     name = "name"
-    values = ["suse-sles-15-sp*"]
+    values = ["suse-sles-15-sp?-v????????-hvm-ssd-x86_64"]
   }
   filter {
     name   = "virtualization-type"

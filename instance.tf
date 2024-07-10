@@ -11,6 +11,19 @@ resource "aws_instance" "amd64_rhel_8_appdb" {
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
+resource "aws_instance" "amd64_suse_15_appdb" {
+  for_each = local.amd64_suse_15_appdb
+  ami = data.aws_ami.suse_15_amd64.id 
+  instance_type = "t2.micro"              
+  key_name      = aws_key_pair.terraform-keypair.key_name
+  tags = {
+    Name = join("-", [local.tag_instance_name_prefix, each.key])
+    owner = local.tag_owner
+    keep_until = local.tag_keep_until
+  }
+  vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
+}
+
 resource "aws_instance" "amd64_rhel_8_oplog" {
   for_each = local.amd64_rhel_8_oplog
   ami = data.aws_ami.rhel_8_amd64.id
