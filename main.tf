@@ -4,10 +4,13 @@ locals {
 
   # Ops Manager Infrastructure
   amd64_rhel_8_appdb = toset([]) # If 0 use OM, if 1 standalone, if 3 replica set
-  amd64_rhel_8_oplog = toset([]) # 
-  amd64_rhel_8_blockstore = toset([]) # 
-  amd64_rhel_8_opsman = toset(["om1"]) # Empty for Cloud Manager, Ops Man URL will map to the host named "om1" unless you deploy "services"  
-  
+  amd64_rhel_8_oplog = toset([])
+  amd64_rhel_8_blockstore = toset([])
+
+  # Empty for Cloud Manager, Ops Man URL will map to the host named "om1" unless you deploy "services"
+  amd64_rhel_8_opsman = toset([])   
+  amd64_suse_15_opsman = toset(["om1"]) 
+
   # LDAP/Kerberos/Load-Balancer infrastructure
   aarch64_rhel_8_services = toset([])
   # aarch64_rhel_8_services = toset(["services"])

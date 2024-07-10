@@ -7,6 +7,7 @@ resource "local_file" "ansible_inventory" {
           aws_instance.amd64_rhel_8_appdb, 
           aws_instance.amd64_rhel_8_blockstore, 
           aws_instance.amd64_rhel_8_opsman,
+          aws_instance.amd64_suse_15_opsman,
           aws_instance.amd64_rhel_8_oplog,
           aws_instance.amd64_amazon_linux_2,
           aws_instance.amd64_rhel_8,
@@ -18,6 +19,7 @@ resource "local_file" "ansible_inventory" {
         ) : vps.public_dns ]
       amd64_rhel_8_appdb = (length(aws_instance.amd64_rhel_8_appdb) > 0 ? [for vps in aws_instance.amd64_rhel_8_appdb: vps.public_dns] : [for vps in aws_instance.amd64_rhel_8_opsman: vps.public_dns] )
       amd64_rhel_8_opsman = [for vps in aws_instance.amd64_rhel_8_opsman: vps.public_dns]
+      amd64_suse_15_opsman = [for vps in aws_instance.amd64_suse_15_opsman: vps.public_dns]
       amd64_rhel_8_oplog = [for vps in aws_instance.amd64_rhel_8_oplog: vps.public_dns]
       amd64_rhel_8_blockstore = [for vps in aws_instance.amd64_rhel_8_blockstore: vps.public_dns]
       amd64_rhel_8 = [for vps in aws_instance.amd64_rhel_8: vps.public_dns]

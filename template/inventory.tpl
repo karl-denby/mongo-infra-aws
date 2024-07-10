@@ -23,6 +23,11 @@ ${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking
 ${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
+[amd64_suse_15_opsman]
+%{ for ops in amd64_suse_15_opsman ~}
+${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+%{ endfor ~}
+
 [amd64_rhel_8]
 %{ for x in amd64_rhel_8 ~}
 ${x} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'

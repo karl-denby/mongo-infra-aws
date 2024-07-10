@@ -2,8 +2,11 @@ events {}
 http {
     upstream opsman {
         ip_hash;
-        %{ for ops in amd64_rhel_8_opsman ~}
-        ${ops}:8080;
+        %{ for rhel in amd64_rhel_8_opsman ~}
+        ${rhel}:8080;
+        %{ endfor ~}
+        %{ for suse in amd64_suse_15_opsman ~}
+        ${suse}:8080;
         %{ endfor ~}
     }
 

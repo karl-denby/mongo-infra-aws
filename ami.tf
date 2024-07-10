@@ -87,6 +87,24 @@ data "aws_ami" "rhel_8_amd64" {
   owners = ["309956199498"] # RedHat
 }
 
+
+data "aws_ami" "suse_15_amd64" {
+  most_recent = true
+  filter{
+    name = "name"
+    values = ["suse-sles-15-sp*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
+  }
+  owners = ["013907871322"] # Amazon offical SUSE image (we don't want BYOS)
+}
+
 data "aws_ami" "rhel_8_arm" {
   most_recent = true
   filter {
