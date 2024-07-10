@@ -5,27 +5,27 @@ ${host}
 
 [amd64_rhel_8_appdb]
 %{ for app in amd64_rhel_8_appdb ~}
-${app} ansible_user=centos ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_8_oplog]
 %{ for op in amd64_rhel_8_oplog ~}
-${op} ansible_user=centos ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_8_blockstore]
 %{ for block in amd64_rhel_8_blockstore ~}
-${block} ansible_user=centos ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_8_opsman]
 %{ for ops in amd64_rhel_8_opsman ~}
-${ops} ansible_user=centos ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_8]
 %{ for x in amd64_rhel_8 ~}
-${x} ansible_user=centos ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${x} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_9]

@@ -1,0 +1,155 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-4.0
+    description: mongodb-enterprise-4.0
+    file: mongodb-enterprise-4.0
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/4.0/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-4.0.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_4_0_latest"
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-4.2
+    description: mongodb-enterprise-4.2
+    file: mongodb-enterprise-4.2
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/4.2/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-4.2.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_4_2_latest"
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-4.4
+    description: mongodb-enterprise-4.4
+    file: mongodb-enterprise-4.4
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/4.4/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-4.4.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_4_4_latest"
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-5.0
+    description: mongodb-enterprise-5.0
+    file: mongodb-enterprise-5.0
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/5.0/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-5.0.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_5_0_latest"
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-6.0
+    description: mongodb-enterprise-6.0
+    file: mongodb-enterprise-6.0
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/6.0/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-6.0.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_6_0_latest"
+
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-7.0
+    description: mongodb-enterprise-7.0
+    file: mongodb-enterprise-7.0
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/7.0/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-7.0.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_7_0_latest"
+
+- name: CentOS, Stop mongod if running/exists
+  become: true
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongod; then systemctl stop mongod && echo stopped ; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+- name: CentOS, Install mongodb-enterprise
+  become: true
+  become_user: root
+  yum:
+    name: mongodb-enterprise
+    state: latest
+    update_cache: yes
+
+- name: mongod.conf bind to 0.0.0.0
+  become: true
+  become_user: root
+  lineinfile:
+    path: /etc/mongod.conf
+    regexp: '^  bindIp: '
+    line: '  bindIp: 0.0.0.0'
+
+- name: mongod.conf enable replication 1
+  become: true
+  become_user: root
+  lineinfile:
+    path: /etc/mongod.conf
+    regexp: '#replication:'
+    line: 'replication:'
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3"
+
+- name: mongod.conf enable replication 2
+  become: true
+  become_user: root
+  lineinfile:
+    path: /etc/mongod.conf
+    line: '  replSetName: "amd64_rhel_8_appdb"'
+    insertafter: 'replication:'
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3"
+
+- name: CentOS, Enable mongod service
+  become: true
+  become_user: root
+  service:
+    name: mongod
+    enabled: yes
+
+- name: CentOS, Start mongod service
+  become: true
+  become_user: root
+  service: name=mongod state=started
+
+- name: mongod.conf enable replication 3
+  ansible.builtin.command: "mongo --eval 'rs.initiate()'"
+  run_once: true
+  delegate_to: "{{ groups['amd64_rhel_8_appdb'].0 }}"
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3"
+  
+- name: mongod.conf enable replication 4
+  command: mongo --eval 'rs.add("{{ item }}:27017")'
+  delegate_to: "{{ groups['amd64_rhel_8_appdb'].0 }}"
+  run_once: true
+  vars:
+    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3"
+  loop: "{{ amd64_rhel_8_appdb }}"

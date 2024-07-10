@@ -1,0 +1,6 @@
+- name: Install MongoDB Database
+  hosts: [x86_centos7_opsman]
+  gather_facts: yes
+  roles:
+    - ops-mod
+  

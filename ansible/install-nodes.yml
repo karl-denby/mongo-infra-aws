@@ -1,0 +1,15 @@
+- name: Install Automation Agents
+  hosts: [  
+            amd64_amazon_linux_2,
+            amd64_debian11,
+            amd64_rhel_8,
+            amd64_rhel_9, 
+            amd64_ubuntu_20_04, 
+            amd64_ubuntu_22_04, 
+            aarch64_amazon_linux_2
+            aarch64_rhel_8 
+          ]
+  gather_facts: yes
+  roles:
+    - nodes
+  

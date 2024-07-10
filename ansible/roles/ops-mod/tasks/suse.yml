@@ -1,0 +1,7 @@
+- name: "SLES, refresh and install htop"
+  become: yes
+  become_user: root
+  community.general.zypper:
+    name: vim
+    state: present
+    update_cache: yes

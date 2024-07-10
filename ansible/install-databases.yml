@@ -1,0 +1,5 @@
+- name: Install MongoDB Database
+  hosts: [amd64_rhel_8_appdb, amd64_rhel_8_oplog, amd64_rhel_8_blockstore]
+  gather_facts: yes
+  roles:
+    - databases

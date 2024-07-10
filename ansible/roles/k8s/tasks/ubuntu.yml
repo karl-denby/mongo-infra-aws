@@ -1,0 +1,50 @@
+- name: Include ../../vars/om-vars.yaml written by terraform during deploy
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Downlad k0s via install script
+  become: yes
+  become_user: root
+  shell: curl -sSLf https://get.k0s.sh > /tmp/get.k0s.sh
+
+- name: Run the install script
+  become: yes
+  become_user: root
+  command: creates=/usr/local/bin/k0s sh /tmp/get.k0s.sh
+  
+- name: make cluster config directory
+  become: yes
+  become_user: root
+  command: mkdir -p /etc/k0s
+
+- name: make cluster config directory
+  become: yes
+  become_user: root
+  shell: k0s config create > /etc/k0s/k0s.yaml
+
+- name: create_default_storage_class
+  become: yes
+  become_user: root
+  ansible.builtin.lineinfile:
+  
+    path: /etc/k0s/k0s.yaml
+    search_string: '      create_default_storage_class: false'
+    line: '      create_default_storage_class: true'
+
+- name: openebs_local_storage
+  become: yes
+  become_user: root
+  ansible.builtin.lineinfile:
+    path: /etc/k0s/k0s.yaml
+    search_string: '      type: external_storage'
+    line: '      type: openebs_local_storage'
+
+- name: Install k0s
+  become: yes
+  become_user: root
+  command: k0s install controller --single -c /etc/k0s/k0s.yaml
+
+- name: Install k0s
+  become: yes
+  become_user: root
+  command: k0s start

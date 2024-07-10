@@ -1,0 +1,96 @@
+- name: Debian/Ubuntu, install MongoDB Enterprise dependencies via apt
+  become: yes
+  become_user: root
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+        - libcurl3-gnutls
+        - libcurl4
+        - libgssapi-krb5-2
+        - libkrb5-dbg
+        - libldap-2.4-2
+        - libpci3
+        - libsasl2-2
+        - snmp
+        - openssl
+        - gnupg
+
+- name: Debian/Ubuntu, add apt-key
+  become: yes
+  become_user: root
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-4.0.asc
+    state: present
+  when: version == "db_4_0_latest"
+
+- name: Debian/Ubuntu, add apt repository
+  become: yes
+  become_user: root
+  apt_repository:
+    repo: "deb [ arch=amd64,arm64,s390x ] http://repo.mongodb.com/apt/ubuntu bionic/mongodb-enterprise/4.0 multiverse"
+    state: present
+    filename: mongodb-enerprise
+    update_cache: yes
+  when: version == "db_4_0_latest"
+
+- name: Debian/Ubuntu, add apt-key
+  become: yes
+  become_user: root
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-4.2.asc
+    state: present
+  when: version == "db_4_2_latest"
+
+- name: Debian/Ubuntu, add apt repository
+  become: yes
+  become_user: root
+  apt_repository:
+    repo: "deb [ arch=amd64,arm64,s390x ] http://repo.mongodb.com/apt/ubuntu bionic/mongodb-enterprise/4.2 multiverse"
+    state: present
+    filename: mongodb-enerprise
+    update_cache: yes
+  when: version == "db_4_2_latest"
+
+- name: Debian/Ubuntu, add apt-key
+  become: yes
+  become_user: root
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-4.4.asc
+    state: present
+  when: version == "db_4_4_latest"
+
+- name: Debian/Ubuntu, add apt repository
+  become: yes
+  become_user: root
+  apt_repository:
+    repo: "deb [ arch=amd64,arm64,s390x ] http://repo.mongodb.com/apt/ubuntu bionic/mongodb-enterprise/4.4 multiverse"
+    state: present
+    filename: mongodb-enerprise
+    update_cache: yes
+  when: version == "db_4_4_latest"
+
+- name: Debian/Ubuntu, install mongodb-enterprise
+  become: yes
+  become_user: root
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+        - mongodb-enterprise
+
+- name: Debian/Ubuntu, enable mongod service
+  become: yes
+  become_user: root
+  service:
+    name: mongod
+    enabled: yes
+
+- name: Debian/Ubuntu, start mongod
+  become: yes
+  become_user: root
+  service: name=mongod state=started
