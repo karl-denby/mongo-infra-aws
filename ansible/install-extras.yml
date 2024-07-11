@@ -1,6 +1,6 @@
 ---
 - name: Install extras
-  hosts: [arm_centos8s_extras]
+  hosts: [aarch64_backing_services]
   gather_facts: yes
   roles:
     - extras
