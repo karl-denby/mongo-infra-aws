@@ -165,7 +165,7 @@
     regexp: '^mongo.mongoUri'
     line: mongo.mongoUri=mongodb://{{appdb.0}}:27017/
   vars:
-    HOST_COUNT: "{{ groups['amd64_suse_15_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int == 1" # Standalone
 
 - name: Replace a localhost appdb with our own
@@ -176,7 +176,7 @@
     regexp: '^mongo.mongoUri'
     line: mongo.mongoUri=mongodb://{{appdb.0}}:27017,{{appdb.1}}:27017,{{appdb.2}}:27017/
   vars:
-    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int == 3" # Replica Set
 
 - name: Add settings to /opt/mongodb/mms/conf/conf-mms.properties

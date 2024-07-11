@@ -1,3 +1,10 @@
+data "aws_ami" "backing_amd64" {
+    filter {
+      name = "image-id" 
+      values = [local.om_os == "rhel" ? data.aws_ami.rhel_8_amd64.id : ( local.om_os == "suse" ? data.aws_ami.suse_15_amd64.id : ( local.om_os == "ubuntu" ? data.aws_ami.ubuntu_20_04_amd64.id : data.aws_ami.rhel_8_amd64.id))]
+    }
+}
+
 data "aws_ami" "ubuntu_20_04_amd64" {
   most_recent = true
   filter {

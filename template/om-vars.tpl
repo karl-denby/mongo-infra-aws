@@ -7,22 +7,12 @@ appdb:
 om_url:
   - ${ om_url }
 
-amd64_rhel_8_private:
-%{ for node in amd64_rhel_8_private ~}
+amd64_backing_private:
+%{ for node in amd64_backing_private ~}
   - ${ node }
 %{ endfor ~}
 
-amd64_rhel_8_public:
-%{ for node in amd64_rhel_8_public ~}
-  - ${ node }
-%{ endfor ~}
-
-amd64_suse_15_private:
-%{ for node in amd64_suse_15_private ~}
-  - ${ node }
-%{ endfor ~}
-
-amd64_suse_15_public:
-%{ for node in amd64_suse_15_public ~}
+amd64_backing_public:
+%{ for node in amd64_backing_public ~}
   - ${ node }
 %{ endfor ~}
