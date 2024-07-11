@@ -3,7 +3,7 @@ locals {
   cloudmanager = "https://cloud.mongodb.com"   # Cloud Manager url, if Ops Manager is not used
 
   # Ops Manager and backing database Operating System Selector
-  om_os = "suse" # rhel/suse/ubuntu
+  om_os = "rhel" # rhel/suse/ubuntu
 
   # Ops Manager Infrastructure
   amd64_backing_appdb = toset([]) # If 0 use OM, if 1 standalone, if 3 replica set
@@ -14,7 +14,7 @@ locals {
   amd64_backing_opsman = toset(["om1"])
 
   # LDAP/Kerberos/Load-Balancer infrastructure
-  aarch64_rhel_8_services = toset([]) # blank or "services"
+  aarch64_backing_services = toset(["services"]) # empty or "services"
 
   # amd64 Deployments
   amd64_amazon_linux_2 = toset([])

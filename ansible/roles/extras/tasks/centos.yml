@@ -3,19 +3,19 @@
     file: vars/om-vars.yaml
 
 - name: Disable SELinux
-  become: yes
+  become: true
   become_user: root
   ansible.posix.selinux:
     policy: targeted
     state: permissive
 
 - name: Set hostname to internal ec2 address
-  become: yes
+  become: true
   become_user: root
-  shell: hostnamectl set-hostname {{services_public.0}}
+  shell: hostnamectl set-hostname {{amd64_backing_public.0}}
 
-- name: Centos8 install IdM
-  become: yes
+- name: RHEL 8 install IdM
+  become: true
   become_user: root
   yum:
     name: "{{ packages }}"
@@ -28,7 +28,7 @@
   when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
 
 # - name: Enable EPEL Repository on CentOS 7
-#   become: yes
+#   become: true
 #   become_user: root
 #   yum:
 #     name: epel-release
@@ -36,14 +36,14 @@
 #   when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '7'
 
 # - name: "update nss* so that ipa-server doesn't fail to install"
-#   become: yes
+#   become: true
 #   become_user: root
 #   yum: 
 #     name: nss*
 #     state: latest 
 
 # - name: "CentOS, ipa-server, nginx"
-#   become: yes
+#   become: true
 #   become_user: root
 #   yum:
 #     name: "{{ packages }}"
@@ -74,84 +74,84 @@
 #         - vim
 
 - name: CentOS, stop nginx
-  become: yes
+  become: true
   become_user: root
   systemd:
     name: nginx
     state: stopped
   vars:
-    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+    HOST_COUNT: "{{ groups['aarch64_backing_services'] | length }}"
   when: "HOST_COUNT | int > 0"
 
 - name: Copy nginx config file
-  become: yes
+  become: true
   become_user: root
   copy:
     src: nginx.conf
     dest: /etc/nginx/nginx.conf
   vars:
-    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+    HOST_COUNT: "{{ groups['aarch64_backing_services'] | length }}"
   when: "HOST_COUNT | int > 0"
 
 - name: CentOS, start nginx
-  become: yes
+  become: true
   become_user: root
   systemd:
     name: nginx
     state: started
   vars:
-    HOST_COUNT: "{{ groups['x86_centos7_opsman'] | length }}"
+    HOST_COUNT: "{{ groups['aarch64_backing_services'] | length }}"
   when: "HOST_COUNT | int > 0"
 
 # - name: CentOS, enable cockpit.socket
-#   become: yes
+#   become: true
 #   become_user: root
 #   systemd:
 #     name: cockpit.socket
 #     enabled: yes
 
   # - name: Remove IPA server
-  #   become: yes
+  #   become: true
   #   become_user: root
   #   shell: ipa-server-install --uninstall
   #   when: freeipa == remove
 
-- name: Create a 2GB swap file
-  become: yes
-  become_user: root
-  shell: dd if=/dev/zero of=/swap bs=1024 count=2000000
+# - name: Create a 2GB swap file
+#   become: true
+#   become_user: root
+#   shell: dd if=/dev/zero of=/swap bs=1024 count=2000000
 
-- name: Change permissions of swap file
-  become: yes
-  become_user: root
-  shell: chmod 0600 /swap
+# - name: Change permissions of swap file
+#   become: true
+#   become_user: root
+#   shell: chmod 0600 /swap
 
-- name: Format swap file
-  become: yes
-  become_user: root
-  shell: mkswap /swap
+# - name: Format swap file
+#   become: true
+#   become_user: root
+#   shell: mkswap /swap
 
-- name: Enable swap file
-  become: yes
-  become_user: root
-  shell: swapon /swap
+# - name: Enable swap file
+#   become: true
+#   become_user: root
+#   shell: swapon /swap
 
 - name: modify the hosts file
-  become: yes
+  become: true
   become_user: root
   lineinfile:
     path: /etc/hosts
     regexp: '^::1         localhost localhost.localdomain localhost6 localhost6.localdomain6'
-    line: "{{ ansible_default_ipv4.address }} {{ services_public.0 }}"
+    line: "{{ ansible_default_ipv4.address }} {{ amd64_backing_public.0 }}"
 
 - name: Install IPA server
-  become: yes
+  become: true
   become_user: root
   shell: ipa-server-install --realm IDM.EXAMPLE.COM --ds-password password --admin-password password --skip-mem-check --unattended
   when: freeipa == "install"
 
 #- name: Create ops_admin LDAP user
-#  become: yes
+#  become: true
 #  become_user: root
 #  shell: ipa user-add ops_admin --first=ops --last=admin --cn=ops_admin --random --email=ops_admin@IDM.EXAMPLE.COM
 #  when: freeipa == install

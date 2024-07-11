@@ -23,6 +23,14 @@ export AWS_SESSION_TOKEN="REDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACT
 6. Run `terraform apply` if you are happy with the plan and wait for the instances to be created
 
 ### Part B: Install Software on VPS Instances
+0. (Optional) If you want to setup LDAP/Kerberos/Load-Balancer do the following
+```
+ansible-galaxy collection install ansible.posix
+ansible-playbook -i ansible/inventory.ini \
+                 -e 'freeipa=install' \
+                 ansible/install-extras.yml
+```
+
 1. You'll need an AppDB, this will go to AppDB servers or if none exist it will be co-hosted on the Ops Manager server
 ```
 ansible-playbook -i ansible/inventory.ini \
@@ -45,4 +53,5 @@ ansible-playbook -i ansible/inventory.ini \
                  -e 'saslauthd=false' \
                  ansible/install-nodes.yml
 ```
+
 4. When your done and you want to **remove everything** run 'terraform destroy'

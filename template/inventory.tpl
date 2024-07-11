@@ -8,6 +8,11 @@ ${host}
 ${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
+[amd64_backing_opsman]
+%{ for ops in amd64_backing_opsman ~}
+${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+%{ endfor ~}
+
 [amd64_backing_oplog]
 %{ for op in amd64_backing_oplog ~}
 ${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
@@ -18,9 +23,9 @@ ${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no
 ${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
-[amd64_backing_opsman]
-%{ for ops in amd64_backing_opsman ~}
-${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[aarch64_backing_services]
+%{ for block in aarch64_backing_services ~}
+${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_rhel_8]

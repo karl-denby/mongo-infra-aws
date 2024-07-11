@@ -107,6 +107,20 @@ resource "aws_instance" "aarch64_rhel_8" {
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
+resource "aws_instance" "aarch64_backing_services" {
+  for_each = local.aarch64_backing_services
+
+  ami           = data.aws_ami.rhel_8_arm.id
+  instance_type = "m6g.medium"           
+  key_name      = aws_key_pair.terraform-keypair.key_name
+  tags = {
+    Name = join("-", [local.tag_instance_name_prefix, each.key])
+    owner = local.tag_owner
+    keep_until = local.tag_keep_until
+  }
+  vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
+}
+
 resource "aws_instance" "amd64_rhel_9" {
   for_each = local.amd64_rhel_9
 
