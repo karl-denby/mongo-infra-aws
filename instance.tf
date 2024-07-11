@@ -1,6 +1,6 @@
-resource "aws_instance" "amd64_rhel_8_appdb" {
-  for_each = local.amd64_rhel_8_appdb
-  ami = data.aws_ami.rhel_8_amd64.id 
+resource "aws_instance" "amd64_backing_appdb" {
+  for_each = local.amd64_backing_appdb
+  ami = data.aws_ami.backing_amd64.id 
   instance_type = "t2.micro"              
   key_name      = aws_key_pair.terraform-keypair.key_name
   tags = {
@@ -11,9 +11,10 @@ resource "aws_instance" "amd64_rhel_8_appdb" {
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
-resource "aws_instance" "amd64_rhel_8_oplog" {
-  for_each = local.amd64_rhel_8_oplog
-  ami = data.aws_ami.rhel_8_amd64.id
+resource "aws_instance" "amd64_backing_oplog" {
+  for_each = local.amd64_backing_oplog
+  
+  ami = data.aws_ami.backing_amd64.id
   instance_type = "t2.medium"
   key_name      = aws_key_pair.terraform-keypair.key_name
   tags = {
@@ -24,9 +25,10 @@ resource "aws_instance" "amd64_rhel_8_oplog" {
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
-resource "aws_instance" "amd64_rhel_8_blockstore" {
-  for_each = local.amd64_rhel_8_blockstore
-  ami = data.aws_ami.rhel_8_amd64.id
+resource "aws_instance" "amd64_backing_blockstore" {
+  for_each = local.amd64_backing_blockstore
+
+  ami = data.aws_ami.backing_amd64.id
   instance_type = "t2.medium"              
   key_name      = aws_key_pair.terraform-keypair.key_name
   tags = {
@@ -37,10 +39,10 @@ resource "aws_instance" "amd64_rhel_8_blockstore" {
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
-resource "aws_instance" "amd64_rhel_8_opsman" {
-  for_each = local.amd64_rhel_8_opsman
+resource "aws_instance" "amd64_backing_opsman" {
+  for_each = local.amd64_backing_opsman
 
-  ami           = data.aws_ami.rhel_8_amd64.id
+  ami           = data.aws_ami.backing_amd64.id
   instance_type = "t2.large"
   key_name      = aws_key_pair.terraform-keypair.key_name
   tags = {

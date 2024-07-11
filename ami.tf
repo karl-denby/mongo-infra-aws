@@ -1,3 +1,10 @@
+data "aws_ami" "backing_amd64" {
+    filter {
+      name = "image-id" 
+      values = [local.om_os == "rhel" ? data.aws_ami.rhel_8_amd64.id : ( local.om_os == "suse" ? data.aws_ami.suse_15_amd64.id : ( local.om_os == "ubuntu" ? data.aws_ami.ubuntu_20_04_amd64.id : data.aws_ami.rhel_8_amd64.id))]
+    }
+}
+
 data "aws_ami" "ubuntu_20_04_amd64" {
   most_recent = true
   filter {
@@ -85,6 +92,23 @@ data "aws_ami" "rhel_8_amd64" {
     values = ["x86_64"]
   }
   owners = ["309956199498"] # RedHat
+}
+
+data "aws_ami" "suse_15_amd64" {
+  most_recent = true
+  filter{
+    name = "name"
+    values = ["suse-sles-15-sp?-v????????-hvm-ssd-x86_64"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
+  }
+  owners = ["013907871322"] # Amazon offical SUSE image (we don't want BYOS)
 }
 
 data "aws_ami" "rhel_8_arm" {

@@ -3,23 +3,23 @@
 ${host}
 %{ endfor ~}
 
-[amd64_rhel_8_appdb]
-%{ for app in amd64_rhel_8_appdb ~}
+[amd64_backing_appdb]
+%{ for app in amd64_backing_appdb ~}
 ${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
-[amd64_rhel_8_oplog]
-%{ for op in amd64_rhel_8_oplog ~}
+[amd64_backing_oplog]
+%{ for op in amd64_backing_oplog ~}
 ${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
-[amd64_rhel_8_blockstore]
-%{ for block in amd64_rhel_8_blockstore ~}
+[amd64_backing_blockstore]
+%{ for block in amd64_backing_blockstore ~}
 ${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
-[amd64_rhel_8_opsman]
-%{ for ops in amd64_rhel_8_opsman ~}
+[amd64_backing_opsman]
+%{ for ops in amd64_backing_opsman ~}
 ${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 

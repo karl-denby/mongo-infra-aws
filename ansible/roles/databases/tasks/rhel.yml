@@ -111,7 +111,7 @@
     regexp: '#replication:'
     line: 'replication:'
   vars:
-    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
 
 - name: mongod.conf enable replication 2
@@ -119,10 +119,10 @@
   become_user: root
   lineinfile:
     path: /etc/mongod.conf
-    line: '  replSetName: "amd64_rhel_8_appdb"'
+    line: '  replSetName: "amd64_backing_appdb"'
     insertafter: 'replication:'
   vars:
-    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
 
 - name: CentOS, Enable mongod service
@@ -140,16 +140,16 @@
 - name: mongod.conf enable replication 3
   ansible.builtin.command: "mongo --eval 'rs.initiate()'"
   run_once: true
-  delegate_to: "{{ groups['amd64_rhel_8_appdb'].0 }}"
+  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
   vars:
-    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
   
 - name: mongod.conf enable replication 4
   command: mongo --eval 'rs.add("{{ item }}:27017")'
-  delegate_to: "{{ groups['amd64_rhel_8_appdb'].0 }}"
+  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
   run_once: true
   vars:
-    HOST_COUNT: "{{ groups['amd64_rhel_8_appdb'] | length }}"
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
-  loop: "{{ amd64_rhel_8_appdb }}"
+  loop: "{{ amd64_backing_appdb }}"

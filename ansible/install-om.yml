@@ -1,5 +1,5 @@
 - name: Install MongoDB Database
-  hosts: [amd64_rhel_8_opsman]
+  hosts: [amd64_backing_opsman]
   gather_facts: yes
   roles:
     - ops

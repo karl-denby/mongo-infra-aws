@@ -5,10 +5,10 @@ This project does 2 things:
 1. Uses `terraform` to create instances, security-groups on AWS and writes an ansible inventory
 2. Uses `ansible` to deploy mongodb software onto those AWS instances
 
-### Usage
+## Usage
 If a script exists called `quick-start.sh` then run `bash quick-start.sh` and follow the prompts.
 
-## A: Deploy VPS Instances 
+### Part A: Deploy VPS Instances 
 If you want to do things **manually** you can:
 1. Make a copy of `settings.template` and call it `settings.tf`
 2. Fill in the required values for vpc, cidr, tags, etc
@@ -22,7 +22,7 @@ export AWS_SESSION_TOKEN="REDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACT
 5. Run `terraform plan` and check the summary output matches what you want and not errors are shown
 6. Run `terraform apply` if you are happy with the plan and wait for the instances to be created
 
-## B: Install Software on VPS Instances
+### Part B: Install Software on VPS Instances
 1. You'll need an AppDB, this will go to AppDB servers or if none exist it will be co-hosted on the Ops Manager server
 ```
 ansible-playbook -i ansible/inventory.ini \
