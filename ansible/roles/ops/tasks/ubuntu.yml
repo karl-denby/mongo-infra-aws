@@ -1,24 +1,109 @@
-- name: "Ubuntu, Install cockpit via apt"
-  become: yes
+- name: Include ../../vars/om-vars.yaml written by terraform during deployment
+  include_vars:
+    file: vars/om-vars.yaml
+
+- name: Download .deb
+  vars:
+    urls:
+      om_6_0_23: https://downloads.mongodb.com/on-prem-mms/deb/mongodb-mms-6.0.23.100.20240402T1833Z.amd64.deb
+      om_6_0_latest: https://downloads.mongodb.com/on-prem-mms/deb/mongodb-mms-6.0.23.100.20240402T1833Z.amd64.deb
+      om_7_0_8: https://downloads.mongodb.com/on-prem-mms/deb/mongodb-mms-7.0.8.500.20240627T1700Z.amd64.deb
+      om_7_0_latest: https://downloads.mongodb.com/on-prem-mms/deb/mongodb-mms-7.0.8.500.20240627T1700Z.amd64.deb
+    om_download_url: "{{ urls[version] }}"
+  get_url:
+    url: "{{ om_download_url }}"
+    dest: /home/ubuntu/mongodb-mms-{{version}}.deb
+    mode: '0440'
+
+- name: Stop mongodb-mms if exists
+  become: true
+  become_user: root
+  shell: if systemctl is-enabled --quiet mongodb-mms; then systemctl stop mongodb-mms && echo stopped; fi
+  register: output
+  changed_when: "'stopped' in output.stdout"
+
+- name: "Ubuntu, Install a deb via apt"
+  become: true
   become_user: root
   apt:
-    name: "{{ packages }}"
-    state: present
-    update_cache: yes
-  vars:
-    packages:
-        - cockpit
+    deb: /home/ubuntu/mongodb-mms-{{version}}.deb
 
-- name: "Ubuntu, Enable cockpit service"
-  become: yes
+- name: Replace a localhost appdb with our own
+  become: true
+  become_user: root
+  lineinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    regexp: '^mongo.mongoUri'
+    line: mongo.mongoUri=mongodb://{{appdb.0}}:27017/
+  vars:
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
+  when: "HOST_COUNT | int == 1" # Standalone
+
+- name: Replace a localhost appdb with our own
+  become: true
+  become_user: root
+  lineinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    regexp: '^mongo.mongoUri'
+    line: mongo.mongoUri=mongodb://{{appdb.0}}:27017,{{appdb.1}}:27017,{{appdb.2}}:27017/
+  vars:
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
+  when: "HOST_COUNT | int == 3" # Replica Set
+
+- name: Add settings to /opt/mongodb/mms/conf/conf-mms.properties
+  become: true
+  become_user: root
+  blockinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    block: |
+      {{ item.setting }}={{ item.value }}
+    marker: "# Instance Parameter Overrides"
+  loop:
+    - { setting: mms.ignoreInitialUiSetup, value: "true" }
+    - { setting: mms.centralUrl, value: "{{om_url.0}}" }
+    # - { setting: automation.versions.source, value: mongodb }
+    - { setting: mms.adminEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.fromEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.replyToEmailAddr, value: no-reply@opsmanager.local }
+    - { setting: mms.mail.hostname, value: localhost }
+    - { setting: mms.mail.port, value: "25" }
+    - { setting: mms.mail.ssl, value: "true" }
+    - { setting: mms.mail.transport, value: smtp }
+    - { setting: mms.minimumTLSVersion, value: TLSv1.2 }
+    - { setting: backup.forceWtSnapshot, value: "true" }
+    - { setting: backup.forceSnapshot, value: "true" }
+
+- name: Add LDAP settings to /opt/mongodb/mms/conf/conf-mms.properties
+  become: true
+  become_user: root
+  blockinfile:
+    path: /opt/mongodb/mms/conf/conf-mms.properties
+    block: |
+      {{ item.setting }}={{ item.value }}
+    marker: "# Instance Parameter Overrides"
+  loop:
+    - { setting: mms.userSvcClass, value: com.xgen.svc.mms.svc.user.UserSvcLdap }
+    - { setting: mms.ldap.url, value: "ldap://{{services_private.0}}:389" }
+    - { setting: mms.ldap.bindDn, value: 'uid\=admin,cn\=users,cn\=accounts,dc\=idm,dc\=example,dc\=com' }
+    - { setting: mms.ldap.bindPassword, value: password }
+    - { setting: mms.ldap.user.baseDn, value: 'cn\=users,cn\=accounts,dc\=idm,dc=\example,dc\=com' }
+    - { setting: mms.ldap.user.searchAttribute, value: mail }
+    - { setting: mms.ldap.user.group, value: memberOf }
+    - { setting: mms.ldap.global.role.owner, value: 'cn\=mmsglobaladmin,cn\=groups,cn\=accounts,dc\=idm,dc\=example,dc\=com'  }
+    - { setting: mms.ldap.user.email, value: mail }
+    - { setting: mms.ldap.user.firstName, value: givenName }
+    - { setting: mms.ldap.user.lastName, value: sn }
+  when: ldap == "true"
+
+- name: "Enable mongodb-mms service"
+  become: true
   become_user: root
   service:
-    name: cockpit
+    name: mongodb-mms
     enabled: yes
 
-- name: "Ubuntu, Start cockpit service"
-  become: yes
+- name: "Start mongodb-mms"
+  become: true
   become_user: root
-  service:
-    name: cockpit
-    state: started
+  service: name=mongodb-mms state=started
+

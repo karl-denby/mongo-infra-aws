@@ -29,6 +29,7 @@ resource "local_file" "ansible_inventory" {
       amd64_amazon_linux_2 = [for vps in aws_instance.amd64_amazon_linux_2: vps.public_dns]      
       aarch64_amazon_linux_2 = [for vps in aws_instance.aarch64_amazon_linux_2: vps.public_dns]      
       aarch64_rhel_8 = [for vps in aws_instance.aarch64_rhel_8: vps.public_dns]
+      user = (local.om_os=="ubuntu" ? "ubuntu" : "ec2-user")
     }
   )
   filename = "${path.module}/ansible/inventory.ini"
