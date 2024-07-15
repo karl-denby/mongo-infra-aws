@@ -5,22 +5,22 @@ ${host}
 
 [amd64_backing_appdb]
 %{ for app in amd64_backing_appdb ~}
-${app} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${app} ansible_user=${user} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_backing_opsman]
 %{ for ops in amd64_backing_opsman ~}
-${ops} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${ops} ansible_user=${user} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_backing_oplog]
 %{ for op in amd64_backing_oplog ~}
-${op} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${op} ansible_user=${user} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [amd64_backing_blockstore]
 %{ for block in amd64_backing_blockstore ~}
-${block} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+${block} ansible_user=${user} ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 %{ endfor ~}
 
 [aarch64_backing_services]
