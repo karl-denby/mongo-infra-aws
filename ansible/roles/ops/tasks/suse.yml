@@ -119,7 +119,9 @@
       om_7_0_6: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.6.500.20240509T1453Z.x86_64.rpm
       om_7_0_7: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.7.500.20240605T1833Z.x86_64.rpm
       om_7_0_8: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.8.500.20240627T1703Z.x86_64.rpm
-      om_7_0_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.8.500.20240627T1703Z.x86_64.rpm
+      om_7_0_9: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.9.500.20240716T1703Z.x86_64.rpm
+      om_7_0_10: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.10.500.20240731T2149Z.x86_64.rpm
+      om_7_0_latest: https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-7.0.10.500.20240731T2149Z.x86_64.rpm
     om_download_url: "{{ urls[version] }}"
   get_url:
     url: "{{ om_download_url }}"
