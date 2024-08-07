@@ -6,9 +6,12 @@ This project does 2 things:
 2. Uses `ansible` to deploy mongodb software onto those AWS instances
 
 ## Usage
-If a script exists called `quick-start.sh` then run `bash quick-start.sh` and follow the prompts.
+### Automatically deploy everything for me, don't ask me much
 
-### Part A: Deploy VPS Instances 
+1. Run `quick-start.sh` and provide any missing values
+2. When finished run `bash clean-up.sh` to remove all resources
+
+### Manual Part A: Deploy VPS Instances 
 If you want to do things **manually** you can:
 1. Make a copy of `settings.template` and call it `settings.tf`
 2. Fill in the required values for vpc, cidr, tags, etc
@@ -22,7 +25,7 @@ export AWS_SESSION_TOKEN="REDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACTEDREDACT
 5. Run `terraform plan` and check the summary output matches what you want and not errors are shown
 6. Run `terraform apply` if you are happy with the plan and wait for the instances to be created
 
-### Part B: Install Software on VPS Instances
+### Manual Part B: Install Software on VPS Instances
 0. (Optional) If you want to setup LDAP/Kerberos/Load-Balancer do the following
 ```
 ansible-galaxy collection install ansible.posix

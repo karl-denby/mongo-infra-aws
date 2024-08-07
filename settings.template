@@ -1,6 +1,8 @@
 locals {
   ### Rename this file settings.tf once you have filled in the required values
-
+  # Ops Manager and backing database Operating System Selector
+  om_os = "rhel" # rhel/suse/ubuntu
+  
   # A prefix for every machine created, so you can find it easily
   tag_instance_name_prefix = "testing"
 
