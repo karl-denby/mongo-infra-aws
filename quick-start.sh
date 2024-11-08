@@ -21,7 +21,8 @@ read -n1 -s -r -p "Press any key to continue... or ctrl+c to exit"
 terraform apply -auto-approve
 
 echo "waiting for instances to boot up..."
-sleep 30
+sleep 90
+read -n1 -s -r -p "Press any key to continue with automatic config... or ctrl+c to exit"
 
 echo "Installing Application Database"
 ansible-playbook -i ansible/inventory.ini \
@@ -30,7 +31,6 @@ ansible-playbook -i ansible/inventory.ini \
 
 echo "Installing Ops Manager"
 ansible-playbook -i ansible/inventory.ini \
-                 -e 'version=om_6_0_latest' \
+                 -e 'version=om_7_0_latest' \
                  -e 'ldap=false' \
                  ansible/install-om.yml
-
