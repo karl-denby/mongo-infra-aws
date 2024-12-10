@@ -100,16 +100,16 @@
   become_user: root
   lineinfile:
     path: /etc/mongod.conf
-    regexp: '^  bindIp: '
-    line: '  bindIp: 0.0.0.0'
+    regexp: "^  bindIp: "
+    line: "  bindIp: 0.0.0.0"
 
 - name: mongod.conf enable replication 1
   become: true
   become_user: root
   lineinfile:
     path: /etc/mongod.conf
-    regexp: '#replication:'
-    line: 'replication:'
+    regexp: "#replication:"
+    line: "replication:"
   vars:
     HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
@@ -120,7 +120,7 @@
   lineinfile:
     path: /etc/mongod.conf
     line: '  replSetName: "amd64_backing_appdb"'
-    insertafter: 'replication:'
+    insertafter: "replication:"
   vars:
     HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
@@ -144,7 +144,7 @@
   vars:
     HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
   when: "HOST_COUNT | int >= 3"
-  
+
 - name: mongod.conf enable replication 4
   command: mongo --eval 'rs.add("{{ item }}:27017")'
   delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
