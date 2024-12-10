@@ -14,22 +14,39 @@ if [[ -z ${AWS_SESSION_TOKEN+x} ]]; then
   export AWS_SESSION_TOKEN
 fi
 
+### MAIN
+
+terraform init  # was missing
+# need to create a public key for use. should be placed in ~/.ssh/id_rsa.pub
 terraform plan
 
 echo "Please check the above plan matches your expectations"
-read -n1 -s -r -p "Press any key to continue... or ctrl+c to exit"
+#read -n1 -s -r -p "Press any key to continue... or ctrl+c to exit"
+sleep 3
 terraform apply -auto-approve
 
 echo "waiting for instances to boot up..."
 sleep 90
-read -n1 -s -r -p "Press any key to continue with automatic config... or ctrl+c to exit"
+
+## preparing hosts for ansible (pre-installing python 3.8)
+echo "pre-installing python 3.8 on all servers as preparation for ansible..."
+
+hosts=$(sed -n '2,6p' ansible/inventory.ini)
+# Loop through each host
+for host in $hosts; do
+  if [[ -n $host ]]; then
+     ssh  -o StrictHostKeyChecking=no ec2-user@$host -C "sudo dnf install -y python38" > /dev/null
+  fi
+done
+echo "Finished installing python 3.8 on all servers - now running ansible..."
 
 echo "Installing Application Database"
 ansible-playbook -i ansible/inventory.ini \
-                 -e 'version=db_6_0_latest' \
-                 ansible/install-databases.yml
+                 -e 'version=db_7_0_latest' \
+                 ansible/install-databases.yml 
+                 #-vvv
 
-echo "Installing Ops Manager"
+# echo "Installing Ops Manager"
 ansible-playbook -i ansible/inventory.ini \
                  -e 'version=om_7_0_latest' \
                  -e 'ldap=false' \
