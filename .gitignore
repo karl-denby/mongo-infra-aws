@@ -11,3 +11,4 @@ ansible/vars/om-vars.yaml
 .DS_Store
 ansible/*.keytab
 settings.tf
+.vscode/*

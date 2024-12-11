@@ -11,27 +11,28 @@
 - name: "Install MongoDB Enterprise dependencies via yum"
   become: true
   become_user: root
-  yum:
-    name: "{{ packages }}"
-    disable_gpg_check: yes
-    state: present
-    skip_broken: true
-    update_cache: yes
-    validate_certs: false
-  vars:
-    packages:
-        - cyrus-sasl
-        - cyrus-sasl-gssapi
-        - cyrus-sasl-plain
-        - krb5-libs
-        - libcurl
-        - lm_sensors-libs
-        - net-snmp
-        - net-snmp-agent-libs
-        - openldap
-        - openssl
-        #- tcp_wrappers-libs
-        - xz-libs
+  shell: yum install -y cyrus-sasl cyrus-sasl-gssapi cyrus-sasl-plain krb5-libs libcurl lm_sensors-libs net-snmp net-snmp-agent-libs openldap openssl xz-libs
+  # yum:
+  #   name: "{{ packages }}"
+  #   disable_gpg_check: yes
+  #   state: present
+  #   skip_broken: true
+  #   update_cache: yes
+  #   validate_certs: false
+  # vars:
+  #   packages:
+  #       - cyrus-sasl
+  #       - cyrus-sasl-gssapi
+  #       - cyrus-sasl-plain
+  #       - krb5-libs
+  #       - libcurl
+  #       - lm_sensors-libs
+  #       - net-snmp
+  #       - net-snmp-agent-libs
+  #       - openldap
+  #       - openssl
+  #       #- tcp_wrappers-libs
+  #       - xz-libs
 
 - name: Stop mongodb-mms-automation-agent.service if exists
   become: true
@@ -43,10 +44,11 @@
 - name: Install an .rpm package
   become: true
   become_user: root
-  yum:
-    name: /home/ec2-user/mongodb-agent.rpm
-    state: present
-    disable_gpg_check: yes
+  shell: rpm -Uvh /home/ec2-user/mongodb-agent.rpm
+  # yum:
+  #   name: /home/ec2-user/mongodb-agent.rpm
+  #   state: present
+  #   disable_gpg_check: yes
 
 - name: Replace agent settings
   become: true
