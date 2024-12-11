@@ -3,7 +3,7 @@
 ### What problem does this solve
 This project does 2 things:
 1. Uses `terraform` to create instances, security-groups on AWS and writes an ansible inventory
-2. Uses `ansible` to deploy mongodb software onto those AWS instances
+2. Uses `ansible` (must be 2.16 or earlier) to deploy mongodb software onto those AWS instances
 
 ## Usage
 ### Automatically deploy everything for me, don't ask me much
