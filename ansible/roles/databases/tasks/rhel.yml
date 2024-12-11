@@ -90,10 +90,11 @@
 - name: CentOS, Install mongodb-enterprise
   become: true
   become_user: root
-  yum:
-    name: mongodb-enterprise
-    state: latest
-    update_cache: yes
+  ansible.builtin.raw: yum install -y mongodb-enterprise
+  # yum:
+  #   name: mongodb-enterprise
+  #   state: latest
+  #   update_cache: yes
 
 - name: mongod.conf bind to 0.0.0.0
   become: true

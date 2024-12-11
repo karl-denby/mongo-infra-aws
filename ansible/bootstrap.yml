@@ -1,0 +1,9 @@
+- name: Setup Python on RHEL8 hosts
+  hosts: [amd64_backing_appdb, amd64_backing_opsman, amd64_backing_oplog, amd64_backing_blockstore, aarch64_backing_services, amd64_rhel_8, aarch64_rhel_8]
+  gather_facts: false
+  # vars:
+  #   ansible_python_interpreter: /usr/libexec/platform-python 
+
+  tasks: 
+  - name: Add a python version that will work with ansible 2.17 clients (like a mac)
+    ansible.builtin.raw: sudo yum module install -y python39:3.9/common

@@ -136,9 +136,10 @@
 - name: Put SELinux in permissive mode, logging actions that would be blocked.
   become: true
   become_user: root
-  ansible.posix.selinux:
-    policy: targeted
-    state: permissive
+  raw: setenforce Permissive
+  # ansible.posix.selinux:
+  #   policy: targeted
+  #   state: permissive
 
 - name: Stop mongodb-mms if exists
   become: true
@@ -150,10 +151,11 @@
 - name: Install an .rpm package
   become: true
   become_user: root
-  yum:
-    name: /home/ec2-user/mongodb-mms-{{version}}.rpm
-    state: present
-    disable_gpg_check: yes
+  shell: yum install -y --nogpgcheck /home/ec2-user/mongodb-mms-{{version}}.rpm
+  # yum:
+  #   name: /home/ec2-user/mongodb-mms-{{version}}.rpm
+  #   state: present
+  #   disable_gpg_check: yes
 
 - name: Copy gen.key to all OM servers
   become: true
