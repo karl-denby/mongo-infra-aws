@@ -24,6 +24,10 @@ echo "waiting for instances to boot up..."
 sleep 90
 read -n1 -s -r -p "Press any key to continue with automatic config... or ctrl+c to exit"
 
+echo "Bootstrap of RHEL8 hosts"
+ansible-playbook -i ansible/inventory.ini \
+                 ansible/bootstrap.yml
+
 echo "Installing Application Database"
 ansible-playbook -i ansible/inventory.ini \
                  -e 'version=db_6_0_latest' \

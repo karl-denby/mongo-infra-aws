@@ -34,6 +34,12 @@ ansible-playbook -i ansible/inventory.ini \
                  ansible/install-extras.yml
 ```
 
+0. (RHEL Users) If you are using ansible >= 2.17 you need to run this or they plays will fail
+```
+ansible-playbook -i ansible/inventory.ini \
+                 ansible/bootstrap.yml
+```
+
 1. You'll need an AppDB, this will go to AppDB servers or if none exist it will be co-hosted on the Ops Manager server
 ```
 ansible-playbook -i ansible/inventory.ini \
