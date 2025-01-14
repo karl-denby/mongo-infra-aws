@@ -11,6 +11,8 @@ This project does 2 things:
 1. Run `quick-start.sh` and provide any missing values
 2. When finished run `bash clean-up.sh` to remove all resources
 
+**Note:** This script supports SSO authentication. If you are using an AWS SSO profile, you can log in beforehand by running `aws sso login`. Once logged in, you don’t need to export or specify credentials manually. The script will automatically use the cached credentials from your AWS_PROFILE SSO session.
+
 ### Manual Part A: Deploy VPS Instances 
 If you want to do things **manually** you can:
 1. Make a copy of `settings.template` and call it `settings.tf`
