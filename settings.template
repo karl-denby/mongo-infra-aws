@@ -14,7 +14,7 @@ locals {
 
   # The **default** AWS VPC in which to create your security group
   # Blank if you want the VPC created for you (recommended)
-  default_vpc_id = "vpc-1a1a1a11a11aa1a1a1"
+  default_vpc_id = ""
 
   # The IP Address or CIDRs you want to give access to the created machines
   cidr_blocks = toset(
