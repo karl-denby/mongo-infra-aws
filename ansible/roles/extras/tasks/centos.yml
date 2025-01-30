@@ -153,11 +153,11 @@
     regexp: '^::1         localhost localhost.localdomain localhost6 localhost6.localdomain6'
     line: "{{ ansible_default_ipv4.address }} {{ amd64_backing_public.0 }}"
 
-- name: Install IPA server
-  become: true
-  become_user: root
-  shell: ipa-server-install --realm IDM.EXAMPLE.COM --ds-password password --admin-password password --skip-mem-check --unattended
-  when: freeipa == "install"
+# - name: Install IPA server
+#   become: true
+#   become_user: root
+#   shell: ipa-server-install --realm IDM.EXAMPLE.COM --ds-password password --admin-password password --skip-mem-check --unattended
+#   when: freeipa == "install"
 
 #- name: Create ops_admin LDAP user
 #  become: true
