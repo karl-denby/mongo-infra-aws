@@ -654,6 +654,7 @@ resource "local_file" "ansible_vars" {
     {
       appdb = (length(aws_instance.amd64_backing_appdb) > 0 ? [for vps in aws_instance.amd64_backing_appdb: vps.private_ip] : [for vps in aws_instance.amd64_backing_opsman: vps.private_ip]) 
       om_url = ((length(aws_instance.amd64_backing_opsman) > 0) ? "http://${aws_instance.amd64_backing_opsman["om1"].public_dns}:8080" : local.cloudmanager)
+      services_url = "http://${aws_instance.aarch64_backing_services["services"].public_dns}:3000"
       amd64_backing_private = [for vps in aws_instance.aarch64_backing_services: vps.private_dns]
       amd64_backing_public = [for vps in aws_instance.aarch64_backing_services: vps.public_dns]
     }

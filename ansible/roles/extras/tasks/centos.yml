@@ -2,30 +2,35 @@
   include_vars:
     file: vars/om-vars.yaml
 
-- name: Disable SELinux
+- name: Disable SELinux Enforcement
   become: true
-  become_user: root
-  ansible.posix.selinux:
-    policy: targeted
-    state: permissive
+  command: setenforce 0
+  changed_when: false
+
+- name: Permanently Disable SELinux (survives after a reboot)
+  become: true
+  replace:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=enforcing'
+    replace: 'SELINUX=permissive'
 
 - name: Set hostname to internal ec2 address
   become: true
   become_user: root
   shell: hostnamectl set-hostname {{amd64_backing_public.0}}
 
-- name: RHEL 8 install IdM
-  become: true
-  become_user: root
-  yum:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-      - '@idm:DL1'
-      - 'freeipa-server'
-      - 'nginx'
-  when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
+# - name: RHEL 8 install IdM
+#   become: true
+#   become_user: root
+#   yum:
+#     name: "{{ packages }}"
+#     state: present
+#   vars:
+#     packages:
+#       - '@idm:DL1'
+#       - 'freeipa-server'
+#       - 'nginx'
+#   when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
 
 # - name: Enable EPEL Repository on CentOS 7
 #   become: true
@@ -72,6 +77,10 @@
 #         - ipa-server-dns         ## DNS addon
 #         - nginx                  ## Load-balancer
 #         - vim
+
+- name: Install nginx
+  command: yum install -y nginx
+  become: yes
 
 - name: CentOS, stop nginx
   become: true
