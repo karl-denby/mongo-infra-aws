@@ -148,6 +148,9 @@
   delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
   run_once: true
   changed_when: false
+  vars:
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3 and mongo_shell_path.stdout != ''"
 
 - name: Add Secondary Nodes to Replica Set
   ansible.builtin.command: "{{ mongo_shell_path.stdout }} --eval 'rs.add(\"{{ item }}:27017\")'"
