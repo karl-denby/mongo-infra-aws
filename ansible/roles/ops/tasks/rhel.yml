@@ -217,7 +217,7 @@
     marker: "# Instance Parameter Overrides"
   loop:
     - { setting: mms.ignoreInitialUiSetup, value: "true" }
-    - { setting: mms.centralUrl, value: "{{om_url.0}}" }
+    - { setting: mms.centralUrl, value: "{{ services_url.0 | default(om_url.0) }}" }
     # - { setting: automation.versions.source, value: mongodb }
     - { setting: mms.adminEmailAddr, value: no-reply@opsmanager.local }
     - { setting: mms.fromEmailAddr, value: no-reply@opsmanager.local }

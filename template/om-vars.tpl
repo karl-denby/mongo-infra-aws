@@ -7,6 +7,9 @@ appdb:
 om_url:
   - ${ om_url }
 
+services_url:
+  - ${ services_url }
+
 amd64_backing_private:
 %{ for node in amd64_backing_private ~}
   - ${ node }
