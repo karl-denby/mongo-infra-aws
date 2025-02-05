@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}
+
 locals {
   # Cloud Manager Infrastructure
   cloudmanager = "https://cloud.mongodb.com"   # Cloud Manager url, if Ops Manager is not used
