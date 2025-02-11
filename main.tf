@@ -59,7 +59,6 @@ resource "aws_subnet" "created_subnet" {
   count  = local.create_vpc ? 1 : 0
   vpc_id = aws_vpc.created_vpc[0].id
   cidr_block = "10.0.1.0/24"
-  availability_zone = "eu-west-1a"
   map_public_ip_on_launch = true # Automatically assign public IPs to instances
 
   tags = {
