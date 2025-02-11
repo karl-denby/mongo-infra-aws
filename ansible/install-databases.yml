@@ -1,7 +1,17 @@
+- name: Set os_release
+  hosts: [amd64_backing_appdb, amd64_backing_oplog, amd64_backing_blockstore]
+  gather_facts: no
+  tasks:
+    - name: Read OS Release Info
+      raw: cat /etc/os-release
+      register: os_release
+      changed_when: false
+
 - name: Install MongoDB Database
   hosts: [amd64_backing_appdb, amd64_backing_oplog, amd64_backing_blockstore]
   gather_facts: yes
+  vars:
+    ansible_python_interpreter: >-
+      {{ '/usr/bin/python3.11' if 'SUSE' in hostvars[inventory_hostname]['os_release'].stdout or 'sles' in hostvars[inventory_hostname]['os_release'].stdout else '/usr/bin/python3.9' }}
   roles:
     - databases
-  vars:
-    ansible_python_interpreter: /usr/bin/python3.9

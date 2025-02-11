@@ -20,7 +20,7 @@ locals {
   amd64_backing_opsman = toset(["om1"])
 
   # LDAP/Kerberos/Load-Balancer infrastructure
-  aarch64_backing_services = toset(["services"]) # empty or "services"
+  aarch64_backing_services = toset([]) # empty or "services"
 
   # amd64 Deployments
   amd64_amazon_linux_2 = toset([])
@@ -33,6 +33,75 @@ locals {
   # aarch64 Deployments
   aarch64_amazon_linux_2 = toset([])
   aarch64_rhel_8         = toset([])
+
+  # VPC configuration
+  vpc_cidr = "10.0.0.0/16"
+  create_vpc = local.default_vpc_id == "" ? true : false
+  vpc_id = local.create_vpc ? aws_vpc.created_vpc[0].id : local.default_vpc_id
+  subnet_id = local.create_vpc ? aws_subnet.created_subnet[0].id : tolist(data.aws_subnets.existing_vpc_subnets[0].ids)[0]
+}
+
+resource "aws_vpc" "created_vpc" {
+  count      = local.create_vpc ? 1 : 0
+  cidr_block = local.vpc_cidr
+
+  enable_dns_support = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name        = "${local.tag_instance_name_prefix}-vpc"
+    owner       = local.tag_owner
+    keep_until  = local.tag_keep_until
+  }
+}
+
+resource "aws_subnet" "created_subnet" {
+  count  = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.created_vpc[0].id
+  cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = true # Automatically assign public IPs to instances
+
+  tags = {
+    Name       = "${local.tag_instance_name_prefix}-subnet"
+    owner      = local.tag_owner
+    keep_until = local.tag_keep_until
+  }
+}
+
+data "aws_subnets" "existing_vpc_subnets" {
+  count = local.create_vpc ? 0 : 1
+
+  filter {
+    name   = "vpc-id"
+    values = [ local.default_vpc_id ]
+  }
+}
+
+resource "aws_internet_gateway" "internet_gateway" {
+  count = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.created_vpc[0].id
+  tags = {
+    Name = "${local.tag_instance_name_prefix}-igw"
+  }
+}
+
+resource "aws_route_table" "public_route_table" {
+  count = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.created_vpc[0].id
+  tags = {
+    Name = "${local.tag_instance_name_prefix}-public-route-table"
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.internet_gateway[0].id
+  }
+}
+
+resource "aws_route_table_association" "public_subnet_association" {
+  count = local.create_vpc ? 1 : 0
+  subnet_id      = aws_subnet.created_subnet[0].id
+  route_table_id = aws_route_table.public_route_table[0].id
 }
 
 # We should check for an SSH key that has id_rsa_${local.tag_instance_name_prefix}.pub and use it, if not existing default to ~/.ssh/id_rsa.pub
@@ -218,6 +287,7 @@ resource "aws_instance" "amd64_backing_appdb" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -232,6 +302,7 @@ resource "aws_instance" "amd64_backing_oplog" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -246,6 +317,7 @@ resource "aws_instance" "amd64_backing_blockstore" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -260,6 +332,7 @@ resource "aws_instance" "amd64_backing_opsman" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 
   root_block_device {
@@ -279,6 +352,7 @@ resource "aws_instance" "amd64_amazon_linux_2" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -292,6 +366,7 @@ resource "aws_instance" "aarch64_amazon_linux_2" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -306,6 +381,7 @@ resource "aws_instance" "amd64_rhel_8" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -320,6 +396,7 @@ resource "aws_instance" "aarch64_rhel_8" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -334,6 +411,7 @@ resource "aws_instance" "aarch64_backing_services" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -348,6 +426,7 @@ resource "aws_instance" "amd64_rhel_9" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -361,6 +440,7 @@ resource "aws_instance" "amd64_ubuntu_20_04" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -375,6 +455,7 @@ resource "aws_instance" "amd64_ubuntu_22_04" {
     owner = local.tag_owner
     keep_until = local.tag_keep_until
   }
+  subnet_id = local.subnet_id
   vpc_security_group_ids = [aws_security_group.tearraform-firewall.id]
 }
 
@@ -383,7 +464,7 @@ resource "aws_instance" "amd64_ubuntu_22_04" {
 resource "aws_security_group" "tearraform-firewall" {
   name        = "terraform-${local.tag_instance_name_prefix}"
   description = "Allow OM and client traffic"
-  vpc_id      =  local.default_vpc_id    
+  vpc_id      =  local.vpc_id    
 
   ingress {
     description = "ssh"
@@ -462,7 +543,7 @@ resource "aws_security_group" "tearraform-firewall" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16"])
+    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16", local.vpc_cidr])
   }
 
   ingress {
@@ -470,7 +551,7 @@ resource "aws_security_group" "tearraform-firewall" {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16"])
+    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16", local.vpc_cidr])
   }
 
   ingress {
@@ -478,7 +559,7 @@ resource "aws_security_group" "tearraform-firewall" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16"])
+    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16", local.vpc_cidr])
   }
 
   ingress {
@@ -494,7 +575,7 @@ resource "aws_security_group" "tearraform-firewall" {
     from_port   = 27000
     to_port     = 28000
     protocol    = "tcp"
-    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16"])
+    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16", local.vpc_cidr])
   }
 
   ingress {
@@ -502,7 +583,7 @@ resource "aws_security_group" "tearraform-firewall" {
     from_port   = 49152
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16"])
+    cidr_blocks = setunion(local.cidr_blocks,["172.31.0.0/16", local.vpc_cidr])
   }
 
   egress {
@@ -573,6 +654,7 @@ resource "local_file" "ansible_vars" {
     {
       appdb = (length(aws_instance.amd64_backing_appdb) > 0 ? [for vps in aws_instance.amd64_backing_appdb: vps.private_ip] : [for vps in aws_instance.amd64_backing_opsman: vps.private_ip]) 
       om_url = ((length(aws_instance.amd64_backing_opsman) > 0) ? "http://${aws_instance.amd64_backing_opsman["om1"].public_dns}:8080" : local.cloudmanager)
+      services_url = (length(aws_instance.aarch64_backing_services) > 0 ? "http://${aws_instance.aarch64_backing_services["services"].public_dns}:3000" : "")
       amd64_backing_private = [for vps in aws_instance.aarch64_backing_services: vps.private_dns]
       amd64_backing_public = [for vps in aws_instance.aarch64_backing_services: vps.public_dns]
     }

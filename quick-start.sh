@@ -20,11 +20,13 @@ ansible-playbook -i ansible/inventory.ini \
 
 echo "Installing Application Database"
 ansible-playbook -i ansible/inventory.ini \
-                 -e 'version=db_6_0_latest' \
+                 -e 'version=db_7_0_latest' \
                  ansible/install-databases.yml
 
 echo "Installing Ops Manager"
 ansible-playbook -i ansible/inventory.ini \
-                 -e 'version=om_7_0_latest' \
+                 -e 'version=om_8_0_latest' \
                  -e 'ldap=false' \
                  ansible/install-om.yml
+
+echo "Quick Setup Completed. If you are running a HA Ops Manager setup, consider running 'ansible-playbook -i ansible/inventory.ini ansible/install-extras.yml' to install nginx and other services."

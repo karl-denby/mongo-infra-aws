@@ -80,6 +80,19 @@
     enabled: yes
   when: version == "db_7_0_latest"
 
+- name: CentOS, Add repositories into a file
+  become: true
+  become_user: root
+  yum_repository:
+    name: mongodb-enterprise-8.0
+    description: mongodb-enterprise-8.0
+    file: mongodb-enterprise-8.0
+    baseurl: https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/8.0/$basearch/
+    gpgkey: https://www.mongodb.org/static/pgp/server-8.0.asc
+    gpgcheck: yes
+    enabled: yes
+  when: version == "db_8_0_latest"
+
 - name: CentOS, Stop mongod if running/exists
   become: true
   become_user: root
@@ -137,20 +150,42 @@
   become: true
   become_user: root
   service: name=mongod state=started
-
-- name: mongod.conf enable replication 3
-  ansible.builtin.command: "mongo --eval 'rs.initiate()'"
-  run_once: true
-  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
-  vars:
-    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
-  when: "HOST_COUNT | int >= 3"
   
-- name: mongod.conf enable replication 4
-  command: mongo --eval 'rs.add("{{ item }}:27017")'
+# mongo is replaced by mongosh since 5.0 versions
+- name: Detect Mongo shell (mongo or mongosh)
+  ansible.builtin.command: "bash -c 'command -v mongosh || command -v mongo'"
+  register: mongo_shell_path
+  changed_when: false
+  ignore_errors: true
   delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
   run_once: true
+
+- name: Initiate Replica Set
+  ansible.builtin.command: "{{ mongo_shell_path.stdout }} --eval 'rs.initiate()'"
+  run_once: true
+  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
   vars:
     HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
-  when: "HOST_COUNT | int >= 3"
-  loop: "{{ amd64_backing_appdb }}"
+  when: "HOST_COUNT | int >= 3 and mongo_shell_path.stdout != ''"
+
+- name: Wait for MongoDB Primary Election
+  ansible.builtin.command: "{{ mongo_shell_path.stdout }} --eval 'while (!rs.status().myState || rs.status().myState !== 1) { sleep(1) }'"
+  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
+  run_once: true
+  changed_when: false
+  vars:
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3 and mongo_shell_path.stdout != ''"
+
+- name: Add Secondary Nodes to Replica Set
+  ansible.builtin.command: "{{ mongo_shell_path.stdout }} --eval 'rs.add(\"{{ item }}:27017\")'"
+  delegate_to: "{{ groups['amd64_backing_appdb'].0 }}"
+  run_once: true
+  register: rs_add_result
+  until: rs_add_result.rc == 0
+  retries: 5
+  delay: 2
+  vars:
+    HOST_COUNT: "{{ groups['amd64_backing_appdb'] | length }}"
+  when: "HOST_COUNT | int >= 3 and mongo_shell_path.stdout != ''"
+  loop: "{{ groups['amd64_backing_appdb'] | difference([groups['amd64_backing_appdb'].0]) }}"
