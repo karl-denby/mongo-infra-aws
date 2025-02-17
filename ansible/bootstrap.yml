@@ -1,9 +1,19 @@
-- name: Setup Python on RHEL8 hosts
+- name: Setup Python on RHEL8 and Ubuntu hosts
   hosts: [amd64_backing_appdb, amd64_backing_opsman, amd64_backing_oplog, amd64_backing_blockstore, aarch64_backing_services, amd64_rhel_8, aarch64_rhel_8]
-  gather_facts: false
+  gather_facts: false  # Prevent failure due to missing Python
   # vars:
   #   ansible_python_interpreter: /usr/libexec/platform-python 
 
-  tasks: 
-  - name: Add a python version that will work with ansible 2.17 clients (like a mac)
-    ansible.builtin.raw: sudo yum module install -y python39:3.9/common
+  tasks:
+    - name: Detect OS Family
+      ansible.builtin.raw: cat /etc/os-release | grep '^ID='
+      register: os_family
+      changed_when: false
+
+    - name: Install Python 3.9 on RHEL
+      ansible.builtin.raw: sudo yum module install -y python39:3.9/common
+      when: "'rhel' in os_family.stdout"
+
+    - name: Install Python 3.9 on Ubuntu
+      ansible.builtin.raw: sudo apt update && sudo apt install -y python3.9
+      when: "'ubuntu' in os_family.stdout"

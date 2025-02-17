@@ -7,6 +7,11 @@ appdb:
 om_url:
   - ${ om_url }
 
+services_url:
+%{ if services_url != "" ~}
+  - ${services_url}
+%{ endif ~}
+
 amd64_backing_private:
 %{ for node in amd64_backing_private ~}
   - ${ node }
