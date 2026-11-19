@@ -17,3 +17,8 @@
     - name: Install Python 3.9 on Ubuntu
       ansible.builtin.raw: sudo apt update && sudo apt install -y python3.9
       when: "'ubuntu' in os_family.stdout"
+
+  # Update brotli
+    - name: Update brotli
+      ansible.builtin.raw: sudo dnf update -y brotli
+      when: "'rhel' in os_family.stdout"
