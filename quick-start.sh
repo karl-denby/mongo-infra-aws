@@ -4,6 +4,7 @@ source aws-auth-helper.sh
 
 setup_aws_auth
 
+terraform init 
 terraform plan
 
 echo "Please check the above plan matches your expectations"
